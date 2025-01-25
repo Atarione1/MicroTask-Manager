@@ -11,11 +11,11 @@ export class UsersService extends PrismaClient implements OnModuleInit {
     this.logger.log('Databse connected');
   }
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    return this.user.create({ data: createUserDto });
   }
 
   findAll() {
-    return `This action returns all users`;
+    return this.user.findMany();
   }
 
   findOne(id: number) {
