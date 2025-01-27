@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpStatus,
   Injectable,
   Logger,
   NotFoundException,
@@ -8,6 +9,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaClient } from '@prisma/client';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class UsersService extends PrismaClient implements OnModuleInit {
@@ -38,8 +40,12 @@ export class UsersService extends PrismaClient implements OnModuleInit {
         id: id,
       },
     });
+
     if (!Found) {
-      throw new NotFoundException('el usuario no fue encontrado');
+      throw new RpcException({
+        status: HttpStatus.NOT_FOUND,
+        message: `user with id ${id} not found`,
+      });
     }
     return Found;
   }
@@ -52,7 +58,10 @@ export class UsersService extends PrismaClient implements OnModuleInit {
       data: updateUserDto,
     });
     if (!Found) {
-      throw new NotFoundException(`el usuario ${id} no fue encontrado `);
+      throw new RpcException({
+        status: HttpStatus.NOT_FOUND,
+        message: `user with id ${id} not found`,
+      });
     }
     return Found;
   }
