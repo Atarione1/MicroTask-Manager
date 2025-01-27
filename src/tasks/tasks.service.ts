@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { PrismaClient } from '@prisma/client';
@@ -15,11 +20,11 @@ export class TasksService extends PrismaClient implements OnModuleInit {
   }
 
   findAll() {
-    return this.prismaService.task.findMany();
+    return this.task.findMany();
   }
 
-  findOne(id: number) {
-    const taskFound = await this..task.findUnique({
+  async findOne(id: number) {
+    const taskFound = await this.task.findUnique({
       where: {
         id: id,
       },
@@ -30,7 +35,7 @@ export class TasksService extends PrismaClient implements OnModuleInit {
     return taskFound;
   }
 
-  update(id: number, updateTaskDto: UpdateTaskDto) {
+  async update(id: number, updateTaskDto: UpdateTaskDto) {
     const taskFound = await this.task.update({
       where: {
         id,
@@ -43,8 +48,8 @@ export class TasksService extends PrismaClient implements OnModuleInit {
     return taskFound;
   }
 
-  remove(id: number) {
-    const taskDelete = await this..task.delete({
+  async remove(id: number) {
+    const taskDelete = await this.task.delete({
       where: {
         id: id,
       },

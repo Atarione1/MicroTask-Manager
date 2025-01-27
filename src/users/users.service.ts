@@ -1,4 +1,10 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaClient } from '@prisma/client';
@@ -10,7 +16,15 @@ export class UsersService extends PrismaClient implements OnModuleInit {
     await this.$connect();
     this.logger.log('Databse connected');
   }
-  create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto) {
+    const found = await this.user.findUnique({
+      where: {
+        name: createUserDto.name,
+      },
+    });
+    if (found?.name === createUserDto.name) {
+      throw new BadRequestException('usuario ya existe');
+    }
     return this.user.create({ data: createUserDto });
   }
 
@@ -19,27 +33,28 @@ export class UsersService extends PrismaClient implements OnModuleInit {
   }
 
   async findOne(id: number) {
-    const projectFound = await this.user.findUnique({
+    const Found = await this.user.findUnique({
       where: {
         id: id,
       },
     });
-    if (!projectFound) {
+    if (!Found) {
       throw new NotFoundException('el usuario no fue encontrado');
     }
-    return projectFound;
+    return Found;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    const userr = this.user.update({
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const Found = await this.user.update({
       where: {
         id,
       },
-      data: updateTaskDto,
-    })
-    if (!userr) {
+      data: updateUserDto,
+    });
+    if (!Found) {
       throw new NotFoundException(`el usuario ${id} no fue encontrado `);
     }
+    return Found;
   }
 
   async remove(id: number) {

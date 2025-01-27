@@ -1,6 +1,3 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateTaskDto } from './create-task.dto';
+import { Task } from '@prisma/client';
 
-export class UpdateTaskDto extends PartialType(CreateTaskDto) {
-  id: number;
-}
+export type UpdateTaskDto = Omit<Task, 'createdAt'>;
