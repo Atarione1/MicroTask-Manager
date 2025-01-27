@@ -18,15 +18,39 @@ export class UsersService extends PrismaClient implements OnModuleInit {
     return this.user.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    const projectFound = await this.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    if (!projectFound) {
+      throw new NotFoundException('el usuario no fue encontrado');
+    }
+    return projectFound;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    const userr = this.user.update({
+      where: {
+        id,
+      },
+      data: updateTaskDto,
+    })
+    if (!userr) {
+      throw new NotFoundException(`el usuario ${id} no fue encontrado `);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    const projectDelete = await this.user.delete({
+      where: {
+        id: id,
+      },
+    });
+    if (!projectDelete) {
+      throw new NotFoundException(`el usuario ${id} no fue encontrado `);
+    }
+    return projectDelete;
   }
 }

@@ -11,22 +11,47 @@ export class TasksService extends PrismaClient implements OnModuleInit {
     this.logger.log('Databse connected');
   }
   create(createTaskDto: CreateTaskDto) {
-    return 'This action adds a new task';
+    return this.task.create({ data: createTaskDto });
   }
 
   findAll() {
-    return `This action returns all tasks`;
+    return this.prismaService.task.findMany();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} task`;
+    const taskFound = await this..task.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    if (!taskFound) {
+      throw new NotFoundException('la tarea no fue encontrado');
+    }
+    return taskFound;
   }
 
   update(id: number, updateTaskDto: UpdateTaskDto) {
-    return `This action updates a #${id} task`;
+    const taskFound = await this.task.update({
+      where: {
+        id,
+      },
+      data: updateTaskDto,
+    });
+    if (!taskFound) {
+      throw new NotFoundException(`la tarea ${id} no fue encontrado `);
+    }
+    return taskFound;
   }
 
   remove(id: number) {
-    return `This action removes a #${id} task`;
+    const taskDelete = await this..task.delete({
+      where: {
+        id: id,
+      },
+    });
+    if (!taskDelete) {
+      throw new NotFoundException(`la tarea ${id} no fue encontrado `);
+    }
+    return taskDelete;
   }
 }
