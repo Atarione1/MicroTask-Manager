@@ -1,11 +1,4 @@
-import {
-  BadRequestException,
-  HttpStatus,
-  Injectable,
-  Logger,
-  NotFoundException,
-  OnModuleInit,
-} from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaClient } from '@prisma/client';
@@ -25,7 +18,10 @@ export class UsersService extends PrismaClient implements OnModuleInit {
       },
     });
     if (found?.name === createUserDto.name) {
-      throw new BadRequestException('usuario ya existe');
+      throw new RpcException({
+        status: HttpStatus.FOUND,
+        message: `Usuario ya existe`,
+      });
     }
     return this.user.create({ data: createUserDto });
   }
@@ -73,7 +69,10 @@ export class UsersService extends PrismaClient implements OnModuleInit {
       },
     });
     if (!projectDelete) {
-      throw new NotFoundException(`el usuario ${id} no fue encontrado `);
+      throw new RpcException({
+        status: HttpStatus.NOT_FOUND,
+        message: `user with id ${id} not found`,
+      });
     }
     return projectDelete;
   }

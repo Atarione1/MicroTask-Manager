@@ -10,7 +10,7 @@ async function bootstrap() {
     {
       transport: Transport.TCP,
       options: {
-        port: 3001,
+        port: parseInt(process.env.PORT as string, 10),
       },
     },
   );
@@ -23,6 +23,6 @@ async function bootstrap() {
   );
 
   await app.listen();
-  logger.log('microservice running port 3001');
+  logger.log(`microservice running port ${process.env.PORT}`);
 }
 bootstrap();

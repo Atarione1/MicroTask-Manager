@@ -1,12 +1,8 @@
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-  OnModuleInit,
-} from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { PrismaClient } from '@prisma/client';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class TasksService extends PrismaClient implements OnModuleInit {
@@ -30,12 +26,22 @@ export class TasksService extends PrismaClient implements OnModuleInit {
       },
     });
     if (!taskFound) {
-      throw new NotFoundException('la tarea no fue encontrado');
+      throw new RpcException({
+        status: HttpStatus.NOT_FOUND,
+        message: `task with id ${id} not found`,
+      });
     }
     return taskFound;
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto) {
+    const taskF = await this.findOne(id);
+    if (!taskF) {
+      throw new RpcException({
+        status: HttpStatus.NOT_FOUND,
+        message: `task with id ${id} not found`,
+      });
+    }
     const taskFound = await this.task.update({
       where: {
         id,
@@ -43,7 +49,10 @@ export class TasksService extends PrismaClient implements OnModuleInit {
       data: updateTaskDto,
     });
     if (!taskFound) {
-      throw new NotFoundException(`la tarea ${id} no fue encontrado `);
+      throw new RpcException({
+        status: HttpStatus.NOT_FOUND,
+        message: `task with id ${id} not found`,
+      });
     }
     return taskFound;
   }
@@ -55,7 +64,10 @@ export class TasksService extends PrismaClient implements OnModuleInit {
       },
     });
     if (!taskDelete) {
-      throw new NotFoundException(`la tarea ${id} no fue encontrado `);
+      throw new RpcException({
+        status: HttpStatus.NOT_FOUND,
+        message: `task with id ${id} not found`,
+      });
     }
     return taskDelete;
   }

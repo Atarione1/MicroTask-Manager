@@ -1,3 +1,3 @@
 import { Task } from '@prisma/client';
 
-export type UpdateTaskDto = Omit<Task, 'createdAt'>;
+export type UpdateTaskDto = Omit<Task, 'id | createdAt'>;

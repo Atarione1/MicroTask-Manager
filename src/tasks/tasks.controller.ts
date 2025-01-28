@@ -20,7 +20,7 @@ export class TasksController {
 
   @MessagePattern('findOneTask')
   findOne(@Payload() id: number) {
-    return this.tasksService.findOne(id);
+    return this.tasksService.findOne(+id);
   }
 
   @MessagePattern('updateTask')
